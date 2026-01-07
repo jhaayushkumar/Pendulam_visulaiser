@@ -45,6 +45,22 @@ The script will:
 5.  Generate a phase space plot `output/phase_space.png`.
 6.  Create an animation `output/pendulum_chaos.gif`.
 
+## 🦋 Butterfly Effect Visualizer (Advanced)
+
+This project includes a demonstration of **Sensitive Dependence on Initial Conditions**.
+
+```bash
+python3 butterfly_effect.py
+```
+
+This script:
+1.  Runs **two** simulations simultaneously.
+2.  State A: Standard initial condition.
+3.  State B: Perturbed by only $0.0001$ radians.
+4.  Generates a side-by-side comparison animation showing how they exponentially diverge.
+
+**Check `output/butterfly_effect.gif` to see Chaos in action!**
+
 ## 🧮 Mathematical Theory
 
 The system consists of two masses $m_1$ and $m_2$ connected by massless rods of length $l_1$ and $l_2$.

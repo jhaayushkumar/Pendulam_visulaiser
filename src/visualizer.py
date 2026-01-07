@@ -116,5 +116,94 @@ class Visualizer:
         print(f"Animation saved to {filename}")
         plt.close()
 
+    def animate_comparison(self, df1, df2, filename="butterfly_effect.mp4", fps=30, duration_seconds=15):
+        sim_dt = self.dt
+        frame_step = int((1/fps) / sim_dt)
+        if frame_step < 1: frame_step = 1
+        
+        max_frames = int(duration_seconds * fps)
+        
+        d1 = df1.iloc[::frame_step].head(max_frames).reset_index(drop=True)
+        d2 = df2.iloc[::frame_step].head(max_frames).reset_index(drop=True)
+        
+        l1, l2 = self.params[2], self.params[3]
+        limit = l1 + l2 + 0.5
+        
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.set_xlim(-limit, limit)
+        ax.set_ylim(-limit, limit)
+        ax.set_aspect('equal')
+        ax.grid(True, alpha=0.3)
+        ax.set_title("Butterfly Effect: Sensitivity to Initial Conditions")
+        
+        line1, = ax.plot([], [], 'o-', lw=2, color='black', label='Sim A')
+        trace1, = ax.plot([], [], '-', lw=1, alpha=0.5, color='cyan')
+        
+        line2, = ax.plot([], [], 'o-', lw=2, color='red', alpha=0.6, label='Sim B (Perturbed)')
+        trace2, = ax.plot([], [], '-', lw=1, alpha=0.5, color='magenta')
+        
+        time_template = 'time = %.1fs'
+        time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+        ax.legend(loc='upper right')
+        
+        history_len = int(2 * fps)
+        hist1_x, hist1_y = [], []
+        hist2_x, hist2_y = [], []
+        
+        def init():
+            line1.set_data([], [])
+            trace1.set_data([], [])
+            line2.set_data([], [])
+            trace2.set_data([], [])
+            time_text.set_text('')
+            return line1, trace1, line2, trace2, time_text
+        
+        def update(i):
+            if i >= len(d1) or i >= len(d2): return line1, trace1, line2, trace2, time_text
+            
+            x1a, y1a = d1.loc[i, 'x1'], d1.loc[i, 'y1']
+            x2a, y2a = d1.loc[i, 'x2'], d1.loc[i, 'y2']
+            
+            x1b, y1b = d2.loc[i, 'x1'], d2.loc[i, 'y1']
+            x2b, y2b = d2.loc[i, 'x2'], d2.loc[i, 'y2']
+            
+            line1.set_data([0, x1a, x2a], [0, y1a, y2a])
+            line2.set_data([0, x1b, x2b], [0, y1b, y2b])
+            
+            hist1_x.append(x2a)
+            hist1_y.append(y2a)
+            hist2_x.append(x2b)
+            hist2_y.append(y2b)
+            
+            if len(hist1_x) > history_len:
+                hist1_x.pop(0)
+                hist1_y.pop(0)
+                hist2_x.pop(0)
+                hist2_y.pop(0)
+                
+            trace1.set_data(hist1_x, hist1_y)
+            trace2.set_data(hist2_x, hist2_y)
+            
+            time_text.set_text(time_template % d1.loc[i, 't'])
+            
+            return line1, trace1, line2, trace2, time_text
+        
+        print("Generating comparison animation...")
+        ani = animation.FuncAnimation(fig, update, frames=min(len(d1), len(d2)),
+                                      init_func=init, interval=1000/fps, blit=True)
+        
+        if filename.endswith('.gif'):
+            ani.save(filename, writer='pillow', fps=fps)
+        else:
+            try:
+                ani.save(filename, writer='ffmpeg', fps=fps)
+            except Exception as e:
+                print(f"FFMpeg failed: {e}. Falling back to GIF.")
+                filename = filename.replace('.mp4', '.gif')
+                ani.save(filename, writer='pillow', fps=fps)
+                
+        print(f"Comparison saved to {filename}")
+        plt.close()
+
 if __name__ == "__main__":
     pass
