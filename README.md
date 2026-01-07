@@ -34,7 +34,7 @@ pip install -r requirements.txt
 Run the main script to start the simulation pipeline:
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 The script will:
