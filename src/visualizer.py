@@ -13,7 +13,6 @@ class Visualizer:
         """Plots the phase space (theta vs omega) for both pendulums."""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
         
-        # Pendulum 1
         points = np.array([self.df['theta1'], self.df['omega1']]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
         norm = plt.Normalize(self.df['t'].min(), self.df['t'].max())
@@ -26,7 +25,6 @@ class Visualizer:
         ax1.set_xlabel(r"$\theta_1$ (rad)")
         ax1.set_ylabel(r"$\omega_1$ (rad/s)")
         
-        # Pendulum 2
         points = np.array([self.df['theta2'], self.df['omega2']]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
         lc = LineCollection(segments, cmap='inferno', norm=norm)
@@ -48,15 +46,11 @@ class Visualizer:
         Creates an animation of the double pendulum.
         Refined for speed and aesthetics.
         """
-        # Downsample data to match FPS if necessary
-        # Sim dt might be 0.01s (1000Hz), video fps 30 (33ms).
-        # We need to skip frames.
         
         sim_dt = self.dt
         frame_step = int((1/fps) / sim_dt)
         if frame_step < 1: frame_step = 1
         
-        # Limit duration
         max_frames = int(duration_seconds * fps)
         
         data = self.df.iloc[::frame_step].head(max_frames).reset_index(drop=True)
@@ -76,7 +70,7 @@ class Visualizer:
         time_template = 'time = %.1fs'
         time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
         
-        history_len = int(2 * fps) # 2 seconds of trail used to be 500
+        history_len = int(2 * fps)
         history_x, history_y = [], []
         
         def init():
@@ -109,11 +103,9 @@ class Visualizer:
         ani = animation.FuncAnimation(fig, update, frames=len(data),
                                       init_func=init, interval=1000/fps, blit=True)
         
-        # Save as MP4 using ffmpeg (usually available on standard envs) or pillow for GIF
         if filename.endswith('.gif'):
             ani.save(filename, writer='pillow', fps=fps)
         else:
-            # Fallback to gif if mp4 writer not available or just try standard
             try:
                 ani.save(filename, writer='ffmpeg', fps=fps)
             except Exception as e:
@@ -125,5 +117,4 @@ class Visualizer:
         plt.close()
 
 if __name__ == "__main__":
-    # Stub test (will fail without data, but syntax check)
     pass
