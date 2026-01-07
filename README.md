@@ -53,13 +53,21 @@ This project includes a demonstration of **Sensitive Dependence on Initial Condi
 python3 butterfly_effect.py
 ```
 
-This script:
-1.  Runs **two** simulations simultaneously.
-2.  State A: Standard initial condition.
-3.  State B: Perturbed by only $0.0001$ radians.
-4.  Generates a side-by-side comparison animation showing how they exponentially diverge.
+This script runs **two** simulations simultaneously (State A vs State B with $\Delta\theta=0.0001$) and generates a side-by-side comparison animation in `output/butterfly_effect.gif`.
 
-**Check `output/butterfly_effect.gif` to see Chaos in action!**
+## 📈 Science Dashboard (Data Analytics)
+
+Generate a static "Data Science Dashboard" visualization:
+
+```bash
+python3 dashboard.py
+```
+
+This creates `output/dashboard.png` with 4 panels:
+1.  **Trajectory Trace**: Path of the pendulum in real space (X-Y).
+2.  **Phase Space Attractor**: Visualizing the chaotic strange attractor.
+3.  **Energy Stability**: Verifying physics conservation laws.
+4.  **Time Series**: Raw angular evolution over time.
 
 ## 🧮 Mathematical Theory
 
